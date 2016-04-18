@@ -16,8 +16,13 @@ def main():
     config=config_files('config.ini')
     commit_id=config_files('commit_ids.ini')
     install_dir=config.get('default','install_directory')  
-    git_devstack(install_dir,commit_id)
-    deploy_openstack(install_dir)
+    use_commit=config.get('default','use_commit_id')
+
+    if use_commit=='true':
+        devstack_commit_id(install_dir,commit_id)
+    else:
+        devstack_latest(install_dir)
+    #deploy_openstack(install_dir)
 
 def config_files(config_filename):
     #Function - Parse config files and return object
@@ -26,8 +31,8 @@ def config_files(config_filename):
     config.read(config_filename)
     return config
     
-def git_devstack(install_dir,commit_id):
-    #Function - Git clone devstack and components
+def devstack_commit_id(install_dir,commit_id):
+    #Function - Git clone devstack and components using commit_ids.ini
     #Switch to user's target directory
     git_dir=install_dir+'/devstack'
     os.chdir(install_dir)
@@ -43,11 +48,17 @@ def git_devstack(install_dir,commit_id):
         print 'cloning into %s ...' %i
         git_newrepo=git.Repo.clone_from(git_url, i, branch=git_branch)
         git.Git(git_dir).checkout(git_tag)
-    
+
+def devstack_latest(install_dir):    
+    #Function - Install
+
+    os.chdir(install_dir)   
+    git.Repo.clone_from('https://github.com/openstack-dev/devstack.git', 'devstack')
+
 def deploy_openstack(install_dir):
     #Function - Call devstack's stack.sh script to deploy openstack
     os.chdir(install_dir)
-    subprocess.call("./stack.sh")
+    subprocess.call(".devstack/stack.sh")
 
 
 if __name__ == "__main__":
