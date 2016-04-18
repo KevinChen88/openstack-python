@@ -46,12 +46,11 @@ def devstack_commit_id(install_dir,commit_id):
             git_dir=new_dir+'/'+i
             os.chdir(new_dir)
         print 'cloning into %s ...' %i
-        git_newrepo=git.Repo.clone_from(git_url, i, branch=git_branch)
+        git.Repo.clone_from(git_url, i, branch=git_branch)
         git.Git(git_dir).checkout(git_tag)
 
 def devstack_latest(install_dir):    
     #Function - Install
-
     os.chdir(install_dir)   
     git.Repo.clone_from('https://github.com/openstack-dev/devstack.git', 'devstack')
 
